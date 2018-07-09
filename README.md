@@ -1,2 +1,2 @@
-# esp32-examples
-ESP32 code examples. Arduino and ESP-IDF
+# ESP32 Projects
+ESP32 Projects based on Arduino IDE and ESP-IDF
