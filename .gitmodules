@@ -1,0 +1,6 @@
+[submodule "demo/esp32/lvgl_basic/components/lvgl"]
+	path = demo/esp32/lvgl_basic/components/lvgl
+	url = https://github.com/lvgl/lvgl.git
+[submodule "demo/esp32/lvgl_basic/components/lvgl_esp32_drivers"]
+	path = demo/esp32/lvgl_basic/components/lvgl_esp32_drivers
+	url = https://github.com/lvgl/lvgl_esp32_drivers.git
