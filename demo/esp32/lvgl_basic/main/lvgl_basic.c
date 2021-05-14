@@ -24,6 +24,8 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 
+#include "esp_log.h"
+
 /* Littlevgl specific */
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include "lvgl.h"
@@ -32,6 +34,9 @@
 #endif
 
 #include "lvgl_helpers.h"
+
+const static char *TAG = "LVGL";
+
 
 void app_main(void)
 {
