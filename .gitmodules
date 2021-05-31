@@ -12,3 +12,6 @@
 [submodule "demo/esp32/lvgl/components/lvgl_esp32_drivers"]
 	path = demo/esp32/lvgl/components/lvgl_esp32_drivers
 	url = https://github.com/lvgl/lvgl_esp32_drivers.git
+[submodule "demo/sound_spectrum/components/esp-dsp"]
+	path = demo/sound_spectrum/components/esp-dsp
+	url = https://github.com/espressif/esp-dsp.git
