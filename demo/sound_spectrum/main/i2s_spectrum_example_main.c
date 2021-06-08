@@ -19,16 +19,27 @@
 static const char* TAG = "PDM_MIC";
 
 #define AUDIO_SAMPLE_RATE       (16000)
-#define PDM_MIC_CLK_IO          (22)
-#define PDM_MIC_DATA_IO         (23)
 #define I2S_CH                  I2S_NUM_0
 #define SAMPLES_NUM             (1024)
+
+// For the PDM microphone
+#define PDM_MIC_CLK_IO          (22)
+#define PDM_MIC_DATA_IO         (23)
+
+// For the I2S microphone (ESP-EYE pin layout)
+#define I2S_MIC_SCK_IO          (26)
+#define I2S_MIC_SDO_IO          (33)
+#define I2S_MIC_WS_IO           (32)
+
+// For the ADC microphone
+#define I2S_ADC_UNIT            ADC_UNIT_1
+#define I2S_ADC_CHANNEL         ADC1_CHANNEL_6
 
 float wind[SAMPLES_NUM];
 float y_cf[SAMPLES_NUM*2];
 float* y1_cf = &y_cf[0];
 
-static void init_microphone(void) 
+static void init_microphone_pdm(void) 
 {
     // Configure the I2S peripheral for the PDM microphone
     i2s_config_t i2s_config = {
@@ -54,6 +65,52 @@ static void init_microphone(void)
     i2s_set_clk(I2S_CH, AUDIO_SAMPLE_RATE, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
 }
 
+static void init_microphone_i2s(void) 
+{
+    // Configure the I2S peripheral for the PDM microphone
+    i2s_config_t i2s_config = {
+        .mode = I2S_MODE_MASTER | I2S_MODE_RX,
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+        .dma_buf_count = 8,
+        .dma_buf_len = 256,
+    };
+
+    // Set the Clock and Data pins
+    i2s_pin_config_t pin_config;
+    pin_config.bck_io_num = I2S_MIC_SCK_IO;
+    pin_config.ws_io_num = I2S_MIC_WS_IO;
+    pin_config.data_out_num = I2S_PIN_NO_CHANGE;
+    pin_config.data_in_num = I2S_MIC_SDO_IO;
+    
+    i2s_driver_install(I2S_CH, &i2s_config, 0, NULL);
+    i2s_set_pin(I2S_CH, &pin_config);
+    i2s_set_clk(I2S_CH, AUDIO_SAMPLE_RATE, I2S_BITS_PER_SAMPLE_16BIT, I2S_CHANNEL_MONO);
+}
+
+static void init_microphone_adc(void) 
+{
+    // Configure the I2S peripheral for the PDM microphone
+    i2s_config_t i2s_config = {
+        .mode = I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_ADC_BUILT_IN,
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+        .dma_buf_count = 8,
+        .dma_buf_len = 256,
+    };
+
+    //install and start i2s driver
+    ESP_ERROR_CHECK(i2s_driver_install(I2S_CH, &i2s_config, 0, NULL));
+    //init ADC pad
+    ESP_ERROR_CHECK(i2s_set_adc_mode(I2S_ADC_UNIT, I2S_ADC_CHANNEL));
+}
+
 static void init_fft(void)
 {
     // Init the FFT
@@ -76,12 +133,20 @@ static void fft_process_and_show(float* data, int length)
     // Convert one complex vector to two complex vectors
     dsps_cplx2reC_fc32(data, length);
 
+    int v_bar = 0;
+
     for (int i = 0 ; i < length/2 ; i++) {
         data[i] = 10 * log10f((data[i * 2 + 0] * data[i * 2 + 0] + data[i * 2 + 1] * data[i * 2 + 1])/SAMPLES_NUM);
+        v_bar += data[i];
     }
 
+    if(v_bar > 10000){
+        printf("%d\n", v_bar);
+    }
+
+    // printf(".", data[i]);
     // Show power spectrum in 64x10 window
-    dsps_view_spectrum(data, length/2, 30, 100);
+    // dsps_view_spectrum(data, length/2, 30, 100);
 }
 
 static void spectrum_task_example(void* arg)
@@ -100,7 +165,7 @@ static void spectrum_task_example(void* arg)
         }
         // Create the spectrum bars visualization
         fft_process_and_show(y_cf, SAMPLES_NUM);
-        vTaskDelay(50/portTICK_RATE_MS);
+        vTaskDelay(30/portTICK_RATE_MS);
     }
 }
 
@@ -109,7 +174,9 @@ void app_main(void)
     ESP_LOGI(TAG, "PDM microphone Example start");
 
     // Init the PDM digital microphone
-    init_microphone();
+    // init_microphone_pdm();
+    // init_microphone_i2s();
+    init_microphone_adc();
     // Init the FFT library
     init_fft();
 

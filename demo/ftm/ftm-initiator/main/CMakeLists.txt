@@ -1,2 +1,2 @@
-idf_component_register(SRCS "ftm_main.c"
+idf_component_register(SRCS "ftm_initiator.c"
                        INCLUDE_DIRS ".")
