@@ -4,8 +4,8 @@
 #include "WiFiProv.h"
 
 #define DEFAULT_POWER_MODE false
-const char *service_name = "PROV_123456";
-const char *pop = "123456";
+const char *service_name = "PROV_DEMO_HELL";
+const char *pop = "654321";
 
 //GPIO for push button
 static int gpio_manual = 34;
@@ -101,11 +101,10 @@ void setup()
     RMaker.start();
 
     WiFi.onEvent(sysProvEvent);
-#if CONFIG_IDF_TARGET_ESP32
+
     WiFiProv.beginProvision(WIFI_PROV_SCHEME_BLE, WIFI_PROV_SCHEME_HANDLER_FREE_BTDM, WIFI_PROV_SECURITY_1, pop, service_name);
-#else
-    WiFiProv.beginProvision(WIFI_PROV_SCHEME_SOFTAP, WIFI_PROV_SCHEME_HANDLER_NONE, WIFI_PROV_SECURITY_1, pop, service_name);
-#endif
+    // WiFiProv.beginProvision(WIFI_PROV_SCHEME_SOFTAP, WIFI_PROV_SCHEME_HANDLER_NONE, WIFI_PROV_SECURITY_1, pop, service_name);
+
 }
 
 void loop()
