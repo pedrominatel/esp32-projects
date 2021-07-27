@@ -2,7 +2,7 @@
 # Component Makefile
 #
 
-set (AZURE_IOT_SDK "${CMAKE_CURRENT_LIST_DIR}/../azure/azure-sdk-for-c")
+set (AZURE_IOT_SDK "${CMAKE_CURRENT_LIST_DIR}/../cloud/azure/azure-sdk-for-c")
 
 set (includes
     "inc"
