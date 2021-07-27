@@ -19,3 +19,6 @@
 	path = demo/azure/azure-as-component/components/azure/azure-sdk-for-c
 	url = https://github.com/Azure/azure-sdk-for-c.git
 	branch = 379fe81df466031a2552f72f6171e8ef0e3cd76a
+[submodule "demo/azure/azure-as-component-nested/demo/azure/azure-as-component-inside/components/my_component/azure-sdk-for-c"]
+	path = demo/azure/azure-as-component-nested/demo/azure/azure-as-component-inside/components/my_component/azure-sdk-for-c
+	url = https://github.com/Azure/azure-sdk-for-c.git

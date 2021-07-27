@@ -14,6 +14,7 @@ void task_tx(void *p)
 
 void app_main()
 {
+    printf("Starting...\n");
     lora_init();
     lora_set_frequency(915e6);
     lora_enable_crc();
