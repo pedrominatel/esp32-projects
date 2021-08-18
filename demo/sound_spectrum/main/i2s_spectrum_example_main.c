@@ -23,8 +23,8 @@ static const char* TAG = "PDM_MIC";
 #define SAMPLES_NUM             (1024)
 
 // For the PDM microphone
-#define PDM_MIC_CLK_IO          (22)
-#define PDM_MIC_DATA_IO         (23)
+#define PDM_MIC_CLK_IO          (25)
+#define PDM_MIC_DATA_IO         (5)
 
 // For the I2S microphone (ESP-EYE pin layout)
 #define I2S_MIC_SCK_IO          (26)
@@ -55,6 +55,7 @@ static void init_microphone_pdm(void)
 
     // Set the Clock and Data pins
     i2s_pin_config_t pin_config;
+    pin_config.mck_io_num = I2S_PIN_NO_CHANGE;
     pin_config.bck_io_num = I2S_PIN_NO_CHANGE;
     pin_config.ws_io_num = PDM_MIC_CLK_IO;
     pin_config.data_out_num = I2S_PIN_NO_CHANGE;
@@ -81,6 +82,7 @@ static void init_microphone_i2s(void)
 
     // Set the Clock and Data pins
     i2s_pin_config_t pin_config;
+    pin_config.mck_io_num = I2S_PIN_NO_CHANGE;
     pin_config.bck_io_num = I2S_MIC_SCK_IO;
     pin_config.ws_io_num = I2S_MIC_WS_IO;
     pin_config.data_out_num = I2S_PIN_NO_CHANGE;
@@ -132,21 +134,8 @@ static void fft_process_and_show(float* data, int length)
     dsps_bit_rev_fc32(data, length);
     // Convert one complex vector to two complex vectors
     dsps_cplx2reC_fc32(data, length);
-
-    int v_bar = 0;
-
-    for (int i = 0 ; i < length/2 ; i++) {
-        data[i] = 10 * log10f((data[i * 2 + 0] * data[i * 2 + 0] + data[i * 2 + 1] * data[i * 2 + 1])/SAMPLES_NUM);
-        v_bar += data[i];
-    }
-
-    if(v_bar > 10000){
-        printf("%d\n", v_bar);
-    }
-
-    // printf(".", data[i]);
     // Show power spectrum in 64x10 window
-    // dsps_view_spectrum(data, length/2, 30, 100);
+    dsps_view_spectrum(data, length/2, 30, 100);
 }
 
 static void spectrum_task_example(void* arg)
@@ -174,9 +163,9 @@ void app_main(void)
     ESP_LOGI(TAG, "PDM microphone Example start");
 
     // Init the PDM digital microphone
-    // init_microphone_pdm();
+    init_microphone_pdm();
     // init_microphone_i2s();
-    init_microphone_adc();
+    // init_microphone_adc();
     // Init the FFT library
     init_fft();
 

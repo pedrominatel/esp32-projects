@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "nvs_flash.h"
-#include "cmd_system.h"
 #include "argtable3/argtable3.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -216,6 +215,8 @@ static bool wifi_cmd_sta_join(const char *ssid, const char *pass)
 static int app_get_ftm(void)
 {
     wifi_ftm_initiator_cfg_t ftmi_cfg = {
+        .resp_mac = {0x7c, 0xdf, 0xa1, 0x0e, 0xde, 0x01},
+        .channel = 1,
         .frm_count = 32,
         .burst_period = 2,
     };
@@ -256,7 +257,6 @@ void app_main(void)
     ESP_ERROR_CHECK( ret );
 
     initialise_wifi();
-
     wifi_cmd_sta_join(WIFI_FTM_SSID, WIFI_FTM_PASS);
     app_get_ftm();
 
